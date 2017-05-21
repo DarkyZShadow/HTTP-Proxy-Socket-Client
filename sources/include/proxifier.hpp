@@ -40,6 +40,7 @@ class Proxifier
 		Proxifier(proxy_t proxy);
 		char					*get_last_error();
 		bool					connect(string remote_host, uint16_t remote_port);
+		int						send(string packet);
 		void					close();
 		response_t				get_last_response();
 		static vector<proxy_t>	proxies_from_file(string filename);

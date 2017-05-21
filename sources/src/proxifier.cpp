@@ -25,23 +25,21 @@ char					*Proxifier::get_last_error()
 bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 {
 	/*char				buffer[512 + 1];*/
-	SOCKADDR_IN			SockAddr;
-	string				packet;
+	SOCKADDR_IN			sockAddr;
 	int					size(0);
 
 	/* Setup the socket */
 	this->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	SockAddr.sin_addr.s_addr = inet_addr(remote_host.c_str());
-	SockAddr.sin_port = htons(remote_port);
-	SockAddr.sin_family = AF_INET;
+	sockAddr.sin_addr.s_addr = inet_addr(remote_host.c_str());
+	sockAddr.sin_port = htons(remote_port);
+	sockAddr.sin_family = AF_INET;
 
 	/* Trying to connect */
-	if (::connect(this->sock, (SOCKADDR*)(&SockAddr), sizeof(SockAddr)) == SOCKET_ERROR)
+	if (::connect(this->sock, (SOCKADDR*)(&sockAddr), sizeof(sockAddr)) == SOCKET_ERROR)
 		return false;
 
 	/* Generate and send packet */
-	packet = generate_packet(remote_host, remote_port);
-	if (send(this->sock, packet.c_str(), packet.size(), 0) == SOCKET_ERROR)
+	if (send(generate_packet(remote_host, remote_port)) == SOCKET_ERROR)
 		return false;
 
 	/* Get response */
@@ -59,6 +57,11 @@ bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 		this->last_response = parse_response(buffer);
 	}*/
 	return true;
+}
+
+int						Proxifier::send(string packet)
+{
+	return ::send(this->sock, packet.c_str(), packet.size(), 0);
 }
 
 void					Proxifier::close()

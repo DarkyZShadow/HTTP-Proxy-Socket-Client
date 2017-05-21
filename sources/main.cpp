@@ -17,6 +17,7 @@ int						main(int argc, char **argvs)
 	response_t			last_res;
 
 	setlocale(LC_ALL, "");
+
 	/* Get proxies list from a file (don't forget to try/catch this function) */
 	proxies = Proxifier::proxies_from_file("resources/proxylist2.txt");
 	for (size_t i = 0; i < proxies.size(); ++i)
