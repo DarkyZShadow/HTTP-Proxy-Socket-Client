@@ -14,7 +14,7 @@
     <ClInclude Include="include\string_funcs.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\proxyfier.hpp">
+    <ClInclude Include="include\proxifier.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
