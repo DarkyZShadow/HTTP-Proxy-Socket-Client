@@ -144,9 +144,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\proxifier.cpp" />
     <ClCompile Include="src\string_funcs.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\proxyfier.hpp" />
     <ClInclude Include="include\string_funcs.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

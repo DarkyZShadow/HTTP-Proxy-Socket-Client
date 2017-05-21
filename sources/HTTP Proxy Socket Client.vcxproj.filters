@@ -14,10 +14,16 @@
     <ClInclude Include="include\string_funcs.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\proxyfier.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\string_funcs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\proxifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
