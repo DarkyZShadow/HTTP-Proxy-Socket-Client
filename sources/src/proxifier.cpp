@@ -24,14 +24,14 @@ char					*Proxifier::get_last_error()
 
 bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 {
-	/*char				buffer[512 + 1];*/
+	char				buffer[512 + 1];
 	SOCKADDR_IN			sockAddr;
 	int					size(0);
 
 	/* Setup the socket */
 	this->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	sockAddr.sin_addr.s_addr = inet_addr(remote_host.c_str());
-	sockAddr.sin_port = htons(remote_port);
+	sockAddr.sin_addr.s_addr = inet_addr(this->proxy.host.c_str());
+	sockAddr.sin_port = htons(this->proxy.port);
 	sockAddr.sin_family = AF_INET;
 
 	/* Trying to connect */
@@ -43,8 +43,8 @@ bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 		return false;
 
 	/* Get response */
-	Sleep(50);
-	/*while (size <= 0)
+	//Sleep(50);
+	while (size <= 0)
 	{
 		size = recv(this->sock, buffer, 512, 0);
 		if (size <= 0)
@@ -55,7 +55,7 @@ bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 
 		buffer[size] = 0;
 		this->last_response = parse_response(buffer);
-	}*/
+	}
 	return true;
 }
 
