@@ -32,7 +32,6 @@ typedef struct
 class Proxifier
 {
 	private:
-		static bool				init_done;
 		SOCKET					sock;
 		proxy_t					proxy;
 		response_t				last_response;
