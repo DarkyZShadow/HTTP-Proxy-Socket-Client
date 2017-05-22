@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <ctime>
 #include <map>
 #include "string_funcs.hpp"
 
@@ -32,12 +33,15 @@ typedef struct
 class Proxifier
 {
 	private:
+		uint32_t				time_out;
+
+	private:
 		SOCKET					sock;
 		proxy_t					proxy;
 		response_t				last_response;
 
 	public:
-		Proxifier(proxy_t proxy);
+		Proxifier(proxy_t proxy, uint32_t time_out = 2000);
 		char					*get_last_error();
 		bool					connect(string remote_host, uint16_t remote_port);
 		int						send(string packet);
@@ -47,8 +51,8 @@ class Proxifier
 
 	private:
 		static void				init_wsa();
-		response_t				parse_response(const char *buffer);
-		string					generate_packet(string remote_host, uint16_t remote_port);
+		static response_t		parse_response(const char *buffer);
+		static string			generate_packet(string remote_host, uint16_t remote_port);
 };
 
 #endif /* __PROXIFIER_HPP__ */

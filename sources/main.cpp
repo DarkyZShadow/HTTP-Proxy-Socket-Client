@@ -1,11 +1,13 @@
-#include <Windows.h>
+﻿#include <Windows.h>
 #include <iostream>
 #include <string>
 #include <vector>
 #include "proxifier.hpp"
 
 #define REMOTE_HOST "138.68.169.204"
-#define REMOTE_PORT 80
+#define REMOTE_PORT 8080
+/*#define REMOTE_HOST "79.110.84.75"
+#define REMOTE_PORT 4002*/
 
 using namespace std;
 
@@ -19,7 +21,7 @@ int						main(int argc, char **argvs)
 	setlocale(LC_ALL, "");
 
 	/* Get proxies list from a file (don't forget to try/catch this function) */
-	proxies = Proxifier::proxies_from_file("resources/proxylist2.txt");
+	proxies = Proxifier::proxies_from_file("resources/working.txt");
 	for (size_t i = 0; i < proxies.size(); ++i)
 	{
 		cur_proxy = proxies[i];
@@ -29,7 +31,7 @@ int						main(int argc, char **argvs)
 		proxifier = new Proxifier(cur_proxy);
 		if (!proxifier->connect(REMOTE_HOST, REMOTE_PORT))
 		{
-			cout << "[!] Error : " << proxifier->get_last_error() << endl;
+			cout << "[!] Error : " << proxifier->get_last_error();
 			delete proxifier;
 			continue;
 		}

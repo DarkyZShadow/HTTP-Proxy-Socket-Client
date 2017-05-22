@@ -1,9 +1,10 @@
 ﻿#include "proxifier.hpp"
 
-Proxifier::Proxifier(proxy_t proxy)
+Proxifier::Proxifier(proxy_t proxy, uint32_t time_out)
 {
 	Proxifier::init_wsa();
 	this->proxy = proxy;
+	this->time_out = time_out;
 }
 
 char					*Proxifier::get_last_error()
@@ -25,17 +26,18 @@ char					*Proxifier::get_last_error()
 bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 {
 	char				buffer[512 + 1];
-	SOCKADDR_IN			sockAddr;
+	SOCKADDR_IN			sock_addr;
+	time_t				beg_time;
 	int					size(0);
 
 	/* Setup the socket */
 	this->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	sockAddr.sin_addr.s_addr = inet_addr(this->proxy.host.c_str());
-	sockAddr.sin_port = htons(this->proxy.port);
-	sockAddr.sin_family = AF_INET;
+	sock_addr.sin_addr.s_addr = inet_addr(this->proxy.host.c_str());
+	sock_addr.sin_port = htons(this->proxy.port);
+	sock_addr.sin_family = AF_INET;
 
 	/* Trying to connect */
-	if (::connect(this->sock, (SOCKADDR*)(&sockAddr), sizeof(sockAddr)) == SOCKET_ERROR)
+	if (::connect(this->sock, (SOCKADDR*)(&sock_addr), sizeof(sock_addr)) == SOCKET_ERROR)
 		return false;
 
 	/* Generate and send packet */
@@ -43,8 +45,9 @@ bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 		return false;
 
 	/* Get response */
-	//Sleep(50);
-	while (size <= 0)
+	beg_time = time(0);
+	this->last_response = {};
+	while (size <= 0 && time(0) < beg_time + this->time_out)
 	{
 		size = recv(this->sock, buffer, 512, 0);
 		if (size <= 0)
@@ -177,7 +180,8 @@ string					Proxifier::generate_packet(string remote_host, uint16_t remote_port)
 	stringstream		packet;
 
 	packet << "CONNECT " << remote_host << ":" << remote_port << " HTTP/1.1\r\n";
-	packet << "Host: " << remote_host << ":" << remote_port << "\r\n";
+	/* packet << "Host: " << remote_host << ":" << remote_port << "\r\n"; */
+	packet << "Proxy-Connections: keep-alive\r\n";
 	packet << "\r\n";
 	return packet.str();
 }
