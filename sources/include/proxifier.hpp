@@ -1,6 +1,10 @@
 ﻿#pragma once
 #ifndef __PROXIFIER_HPP__
 #define __PROXIFIER_HPP__
+#ifndef INFINITE
+#define INFINITE UINT32_MAX
+#endif
+
 #include <algorithm>			/* std::remove */
 #include <Windows.h>
 #include <sstream>
@@ -34,6 +38,7 @@ class Proxifier
 {
 	private:
 		uint32_t				time_out;
+		string					last_error;
 
 	private:
 		SOCKET					sock;
@@ -41,10 +46,11 @@ class Proxifier
 		response_t				last_response;
 
 	public:
-		Proxifier(proxy_t proxy, uint32_t time_out = 2000);
-		char					*get_last_error();
+		Proxifier(proxy_t proxy, uint32_t time_out = 15000);
+		string					get_last_error();
 		bool					connect(string remote_host, uint16_t remote_port);
 		int						send(string packet);
+		string					recv(uint32_t time_out = INFINITE);
 		void					close();
 		response_t				get_last_response();
 		static vector<proxy_t>	proxies_from_file(string filename);

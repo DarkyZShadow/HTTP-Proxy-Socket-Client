@@ -5,16 +5,25 @@ Proxifier::Proxifier(proxy_t proxy, uint32_t time_out)
 	Proxifier::init_wsa();
 	this->proxy = proxy;
 	this->time_out = time_out;
+	this->last_error = "";
+	this->last_response = {};
 }
 
-char					*Proxifier::get_last_error()
+string					Proxifier::get_last_error()
 {
-	int					message_id;
 	char				*result(NULL);
+	int					message_id;
+	string				tmp;
 
 	message_id = WSAGetLastError();
 	if (message_id == 0)
-		return result;
+	{
+		if (last_error.empty())
+			return "\n";
+		tmp = last_error;
+		last_error = "";
+		return tmp;
+	}
 
 	FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL, message_id,
@@ -25,12 +34,11 @@ char					*Proxifier::get_last_error()
 
 bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 {
-	char				buffer[512 + 1];
 	SOCKADDR_IN			sock_addr;
-	time_t				beg_time;
-	int					size(0);
+	string				res;
 
 	/* Setup the socket */
+	this->last_response = {};
 	this->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	sock_addr.sin_addr.s_addr = inet_addr(this->proxy.host.c_str());
 	sock_addr.sin_port = htons(this->proxy.port);
@@ -45,26 +53,47 @@ bool					Proxifier::connect(string remote_host, uint16_t remote_port)
 		return false;
 
 	/* Get response */
-	beg_time = time(0);
-	this->last_response = {};
-	while (size <= 0 && time(0) < beg_time + this->time_out)
-	{
-		size = recv(this->sock, buffer, 512, 0);
-		if (size <= 0)
-		{
-			Sleep(50);
-			continue;
-		}
+	if ((res = recv(this->time_out)).size() <= 0)
+		return false;
 
-		buffer[size] = 0;
-		this->last_response = parse_response(buffer);
-	}
+	this->last_response = parse_response(res.c_str());
 	return true;
 }
 
 int						Proxifier::send(string packet)
 {
 	return ::send(this->sock, packet.c_str(), packet.size(), 0);
+}
+
+string					Proxifier::recv(uint32_t time_out)
+{
+	unsigned long		size;
+	int					size2;
+	DWORD				beg_time;
+	string				result;
+
+	beg_time = GetTickCount();
+	while (GetTickCount() < beg_time + time_out)
+	{
+		/* Get packet size */
+		ioctlsocket(this->sock, FIONREAD, &size);
+		if (size == 0)
+		{
+			Sleep(50);
+			continue;
+		}
+
+		result.resize(size);
+		size2 = ::recv(this->sock, &result[0], size, 0);
+		if (size == size2)
+			break;
+	}
+
+	if (size == 0)
+		this->last_error = "TIMED_OUT\n";
+	else if (size != size2)
+		this->last_error = "UNKNOWN_ERROR\n";
+	return result;
 }
 
 void					Proxifier::close()
