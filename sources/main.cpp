@@ -4,10 +4,8 @@
 #include <vector>
 #include "proxifier.hpp"
 
-#define REMOTE_HOST "138.68.169.204"
+#define REMOTE_HOST "127.0.0.1"
 #define REMOTE_PORT 8080
-/*#define REMOTE_HOST "79.110.84.75"
-#define REMOTE_PORT 4002*/
 
 using namespace std;
 
